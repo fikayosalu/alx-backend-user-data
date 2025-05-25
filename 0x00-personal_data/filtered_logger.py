@@ -5,7 +5,6 @@ import re
 from typing import List, Optional, cast, Dict, Any
 import os
 import mysql.connector
-import bcrypt
 from mysql.connector.connection import MySQLConnection
 
 
@@ -105,22 +104,6 @@ def main() -> None:
         logger.info(message)
     cursor.close()
     conn.close()
-
-
-def hash_password(password: str) -> bytes:
-    """
-    Hashes a password using bcrypt with a generated salt.
-
-    Args:
-        password (str): The plain-text password to hash.
-
-    Returns:
-        bytes: The salted, hashed password.
-    """
-    # Generate salt and hash the password
-    salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
-    return hashed
 
 
 if __name__ == "__main__":
