@@ -2,7 +2,7 @@
 """ filtered_logger """
 import logging
 import re
-from typing import List, Optional, cast
+from typing import List, Optional, cast, Dict, Any
 import os
 import mysql.connector
 from mysql.connector.connection import MySQLConnection
@@ -86,3 +86,25 @@ def get_db() -> MySQLConnection:
         database=database
     )
     return cast(MySQLConnection, conn)
+
+
+def main() -> None:
+    """
+    Connects to the database, retrieves all users,
+    and logs each user row with PII fields filtered.
+    """
+    logger = get_logger()
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users;")
+    for row in cursor.fetchall():
+        # Convert the dict row to log message format: key=value; ...
+        row_dict: Dict[str, Any] = cast(Dict[str, Any], row)
+        message = "; ".join(f"{k}={v}" for k, v in row_dict.items()) + ";"
+        logger.info(message)
+    cursor.close()
+    conn.close()
+
+
+if __name__ == "__main__":
+    main()
