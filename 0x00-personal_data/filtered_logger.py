@@ -2,7 +2,10 @@
 """ filtered_logger """
 import logging
 import re
-from typing import List
+from typing import List, Optional, cast
+import os
+import mysql.connector
+from mysql.connector.connection import MySQLConnection
 
 
 def filter_datum(fields: List[str], redaction: str,
@@ -51,3 +54,35 @@ def get_logger() -> logging.Logger:
 
 
 PII_FIELDS: tuple = ("name", "email", "phone", "ssn", "password")
+
+
+def get_db() -> MySQLConnection:
+    """
+    Connects to a MySQL database using environment variables for credentials.
+
+    Environment Variables:
+        PERSONAL_DATA_DB_USERNAME: MySQL username (default: "root")
+        PERSONAL_DATA_DB_PASSWORD: MySQL password (default: "")
+        PERSONAL_DATA_DB_HOST: MySQL host (default: "localhost")
+        PERSONAL_DATA_DB_NAME: MySQL database name (required)
+
+    Returns:
+        MySQLConnection: A MySQL database connection object.
+    """
+    username: str = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password: str = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    host: str = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    database: Optional[str] = os.getenv("PERSONAL_DATA_DB_NAME")
+
+    if database is None:
+        raise ValueError("Environment variable PERSONAL_DATA_DB_NAME \
+                must be set.")
+    database = cast(str, database)
+
+    conn = mysql.connector.connect(
+        user=username,
+        password=password,
+        host=host,
+        database=database
+    )
+    return cast(MySQLConnection, conn)
