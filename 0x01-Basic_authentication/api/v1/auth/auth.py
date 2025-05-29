@@ -6,6 +6,7 @@ from typing import List, TypeVar
 
 
 class Auth:
+    """ Authorization Class """
     def __init__(self):
         """ Initialize an instance of class auth """
         pass

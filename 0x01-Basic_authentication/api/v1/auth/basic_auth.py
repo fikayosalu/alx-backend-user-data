@@ -9,6 +9,7 @@ UserType = TypeVar('User')
 
 
 class BasicAuth(Auth):
+    """ Basic Authorization """
     def __init__(self):
         """Initialize BasicAuth (inherited from Auth)"""
         pass
