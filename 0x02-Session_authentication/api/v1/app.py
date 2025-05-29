@@ -26,7 +26,8 @@ else:
     from api.v1.auth.auth import Auth
     auth = Auth()
 
-path = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
+path = ['/api/v1/status/', '/api/v1/unauthorized/',
+        '/api/v1/forbidden/', '/api/v1/auth_session/login/']
 
 
 @app.before_request
@@ -35,7 +36,8 @@ def handle_before_request() -> NoReturn:
     request.current_user = auth.current_user(request)
     if auth is None or auth.require_auth(request.path, path) is False:
         return
-    if auth.authorization_header(request) is None:
+    if (auth.authorization_header(request) is None and
+       auth.session_cookie(request) is None):
         abort(401)
     if auth.current_user(request) is None:
         abort(403)
